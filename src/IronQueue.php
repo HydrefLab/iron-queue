@@ -6,6 +6,8 @@ use Collective\IronQueue\Jobs\IronJob;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use Illuminate\Http\Response;
 use Illuminate\Queue\Queue;
 use IronMQ\IronMQ;
@@ -162,6 +164,20 @@ class IronQueue extends Queue implements QueueContract
     }
 
     /**
+     * Create a payload string from the given job and data.
+     *
+     * @param string $job
+     * @param mixed  $data
+     * @param string $queue
+     *
+     * @return string
+     */
+    protected function createPayload($job, $data = '', $queue = null)
+    {
+        return $this->setMeta(parent::createPayload($job, $data), 'queue', $this->getQueue($queue));
+    }
+
+    /**
      * Delete a message from the Iron queue.
      *
      * @param string $queue
@@ -246,6 +262,29 @@ class IronQueue extends Queue implements QueueContract
     public function getIron()
     {
         return $this->iron;
+    }
+
+    /**
+     * Set additional meta on a payload string.
+     *
+     * @param  string  $payload
+     * @param  string  $key
+     * @param  string  $value
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function setMeta($payload, $key, $value)
+    {
+        $payload = json_decode($payload, true);
+
+        $payload = json_encode(Arr::set($payload, $key, $value));
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new InvalidArgumentException('Unable to create payload: '.json_last_error_msg());
+        }
+
+        return $payload;
     }
 
     /**
