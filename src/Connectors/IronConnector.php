@@ -4,6 +4,7 @@ namespace Collective\IronQueue\Connectors;
 
 use Collective\IronQueue\IronQueue;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Http\Request;
 use Illuminate\Queue\Connectors\ConnectorInterface;
 use IronMQ\IronMQ;
@@ -40,10 +41,9 @@ class IronConnector implements ConnectorInterface
      * Establish a queue connection.
      *
      * @param array $config
-     * @param array $config
      * @return \Illuminate\Contracts\Queue\Queue
      */
-    public function connect(array $config)
+    public function connect(array $config): Queue
     {
         $ironConfig = ['token' => $config['token'], 'project_id' => $config['project']];
 

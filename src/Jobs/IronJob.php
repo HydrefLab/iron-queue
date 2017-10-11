@@ -39,7 +39,7 @@ class IronJob extends Job implements JobContract
      * @param object                          $job
      * @param bool                            $pushed
      */
-    public function __construct(Container $container, IronQueue $iron, $job, $pushed = false)
+    public function __construct(Container $container, IronQueue $iron, $job, bool $pushed = false)
     {
         $this->job = $job;
         $this->iron = $iron;
@@ -52,7 +52,7 @@ class IronJob extends Job implements JobContract
      *
      * @return string
      */
-    public function getRawBody()
+    public function getRawBody(): string
     {
         return $this->job->body;
     }
@@ -70,7 +70,7 @@ class IronJob extends Job implements JobContract
             return;
         }
 
-        $this->iron->deleteMessage($this->getQueue(), $this->job->id, $this->job->reservation_id);
+        $this->iron->deleteMessage($this->getQueue(), $this->getJobId(), $this->job->reservation_id);
     }
 
     /**
@@ -94,10 +94,9 @@ class IronJob extends Job implements JobContract
      * Release a pushed job back onto the queue.
      *
      * @param int $delay
-     *
      * @return void
      */
-    protected function recreateJob($delay)
+    protected function recreateJob(int $delay)
     {
         $payload = json_decode($this->job->body, true);
 
@@ -111,9 +110,9 @@ class IronJob extends Job implements JobContract
      *
      * @return int
      */
-    public function attempts()
+    public function attempts(): int
     {
-        return Arr::get(json_decode($this->job->body, true), 'attempts', 1);
+        return (int) Arr::get(json_decode($this->job->body, true), 'attempts', 1);
     }
 
     /**
@@ -121,9 +120,9 @@ class IronJob extends Job implements JobContract
      *
      * @return string
      */
-    public function getJobId()
+    public function getJobId(): string
     {
-        return $this->job->id;
+        return (string) $this->job->id;
     }
 
     /**
@@ -131,7 +130,7 @@ class IronJob extends Job implements JobContract
      *
      * @return \Collective\IronQueue\IronQueue
      */
-    public function getIron()
+    public function getIron(): IronQueue
     {
         return $this->iron;
     }
@@ -151,8 +150,8 @@ class IronJob extends Job implements JobContract
      *
      * @return string
      */
-    public function getQueue()
+    public function getQueue(): string
     {
-        return Arr::get(json_decode($this->job->body, true), 'queue');
+        return (string) Arr::get(json_decode($this->job->body, true), 'queue');
     }
 }

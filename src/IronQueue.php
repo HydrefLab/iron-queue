@@ -56,7 +56,7 @@ class IronQueue extends Queue implements QueueContract
      * @param bool                     $shouldEncrypt
      * @param int                      $timeout
      */
-    public function __construct(IronMQ $iron, Request $request, $default, $shouldEncrypt = false, $timeout = 60)
+    public function __construct(IronMQ $iron, Request $request, string $default, bool $shouldEncrypt = false, int $timeout = 60)
     {
         $this->iron = $iron;
         $this->request = $request;
@@ -71,7 +71,7 @@ class IronQueue extends Queue implements QueueContract
      * @param string|null $queue
      * @return int
      */
-    public function size($queue = null)
+    public function size($queue = null): int
     {
         return (int) $this->getIron()->getQueue($queue)->size;
     }
@@ -114,7 +114,7 @@ class IronQueue extends Queue implements QueueContract
      * @param int    $delay
      * @return mixed
      */
-    public function recreate($payload, $queue, $delay)
+    public function recreate(string $payload, string $queue, int $delay)
     {
         $options = ['delay' => $this->secondsUntil($delay)];
 
@@ -166,12 +166,12 @@ class IronQueue extends Queue implements QueueContract
      *
      * @param string $queue
      * @param string $id
-     * @param string $reservation_id
+     * @param string|null $reservationId
      * @return void
      */
-    public function deleteMessage($queue, $id, $reservation_id)
+    public function deleteMessage(string $queue, string $id, string $reservationId = null)
     {
-        $this->iron->deleteMessage($queue, $id, $reservation_id);
+        $this->iron->deleteMessage($queue, $id, $reservationId);
     }
 
     /**
@@ -210,7 +210,7 @@ class IronQueue extends Queue implements QueueContract
      * @param object $job
      * @return \Collective\IronQueue\Jobs\IronJob
      */
-    protected function createPushedIronJob($job)
+    protected function createPushedIronJob($job): IronJob
     {
         return new IronJob($this->container, $this, $job, true);
     }
@@ -223,7 +223,7 @@ class IronQueue extends Queue implements QueueContract
      * @param  string  $queue
      * @return array
      */
-    protected function createPayloadArray($job, $data = '', $queue = null)
+    protected function createPayloadArray($job, $data = '', $queue = null): array
     {
         return array_merge(parent::createPayloadArray($job, $data, $queue), [
             'queue' => $this->getQueue($queue),
@@ -236,7 +236,7 @@ class IronQueue extends Queue implements QueueContract
      * @param string $body
      * @return string
      */
-    protected function parseJobBody($body)
+    protected function parseJobBody(string $body): string
     {
         return $this->shouldEncrypt ? $this->getEncrypter()->decrypt($body) : $body;
     }
@@ -247,7 +247,7 @@ class IronQueue extends Queue implements QueueContract
      * @param string|null $queue
      * @return string
      */
-    public function getQueue($queue)
+    public function getQueue(string $queue = null): string
     {
         return $queue ?: $this->default;
     }
@@ -257,7 +257,7 @@ class IronQueue extends Queue implements QueueContract
      *
      * @return \IronMQ\IronMQ
      */
-    public function getIron()
+    public function getIron(): IronMQ
     {
         return $this->iron;
     }
@@ -267,7 +267,7 @@ class IronQueue extends Queue implements QueueContract
      *
      * @return \Illuminate\Http\Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -289,7 +289,7 @@ class IronQueue extends Queue implements QueueContract
      * @return \Illuminate\Contracts\Encryption\Encrypter
      * @throws \Exception
      */
-    protected function getEncrypter()
+    protected function getEncrypter(): Encrypter
     {
         if (is_null($this->encrypter)) {
             throw new \Exception('No encrypter has been set on the Queue.');
