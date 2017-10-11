@@ -181,7 +181,7 @@ class IronQueueTest extends \PHPUnit\Framework\TestCase
             ->once()
             ->andReturn($content);
 
-        $mockIronJob = m::mock('StdClass');
+        $mockIronJob = m::mock('Collective\IronQueue\Jobs\IronJob');
         $mockIronJob->shouldReceive('fire')
             ->once();
 
@@ -194,7 +194,10 @@ class IronQueueTest extends \PHPUnit\Framework\TestCase
             ->with($content)
             ->andReturn($content);
 
-        $queue = $this->getMock('Collective\IronQueue\IronQueue', ['createPushedIronJob'], [$iron, $request, 'default', true]);
+        $queue = $this->getMockBuilder('Collective\IronQueue\IronQueue')
+            ->setMethods(['createPushedIronJob'])
+            ->setConstructorArgs([$iron, $request, 'default', true])
+            ->getMock();
         $queue->setEncrypter($crypt);
         $queue->expects($this->once())
             ->method('createPushedIronJob')
