@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class IronQueueTest extends PHPUnit_Framework_TestCase
+class IronQueueTest extends \PHPUnit\Framework\TestCase
 {
     public function tearDown()
     {
