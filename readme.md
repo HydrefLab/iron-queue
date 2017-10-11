@@ -8,8 +8,8 @@ This repository is a fork of [LaravelCollective IronMQ driver repo](https://gith
 I've decided to fork and maintain IronMQ driver repository due to lack of support from original authors/maintainers.
 
 ## Installation
-- `composer require hydreflab/iron-queue` (for Laravel 5.4)
-- Add `Collective\IronQueue\IronQueueServiceProvider::class` to your `app.php` configuration file.
+- `composer require hydreflab/iron-queue`
+- As of Laravel 5.5 package is using auto-discovery feature to register itself.
 - Configure your `iron` queue driver in your `config/queue.php`.
 - Set `iron` as your queue driver in your `.env`.
 
